@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심온·심이든 동생 이름 월드컵 (50강)</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border-color: #e2e8f0;
+            --selected-bg: #e0e7ff;
+            --selected-border: #6366f1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header-family {
+            font-size: 0.95rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 24px;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .match-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 480px) {
+            .match-container {
+                flex-direction: row;
+                gap: 16px;
+            }
+        }
+
+        .name-card {
+            flex: 1;
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .name-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+        }
+
+        .name-card.selected {
+            background-color: var(--selected-bg);
+            border-color: var(--selected-border);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .name-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .name-desc {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+            word-break: keep-all;
+        }
+
+        .selection-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .name-card.selected .selection-badge {
+            display: block;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .winner-box {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            margin-bottom: 24px;
+        }
+
+        .winner-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .winner-name {
+            font-size: 2.4rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+
+        .winner-desc {
+            font-size: 1rem;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+
+        .top10-container {
+            text-align: left;
+            margin-bottom: 24px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .top10-title {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .top10-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .top10-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .top10-rank {
+            font-weight: 800;
+            color: var(--primary);
+            width: 36px;
+        }
+
+        .top10-info {
+            flex: 1;
+        }
+
+        .top10-name {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .top10-desc {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 1. 시작 화면 -->
+        <div id="screen-start" class="screen active">
+            <div class="header-family">첫째 심온 · 둘째 심이든 · 셋째 👶</div>
+            <h1>온·이든 동생 이름 월드컵</h1>
+            <p class="subtitle">남자아이에게 어울리는 세련되고 뜻깊은 이름 50선!</p>
+            <div style="margin: 30px 0; color: var(--text-sub); font-size: 0.95rem; line-height: 1.6;">
+                ✨ 엄선된 50개의 후보로 빠르게 진행됩니다.<br>
+                두 이름 중 더 마음에 드는 이름을 골라주세요.<br>
+                마지막에는 내가 뽑은 <b>TOP 10</b> 결과가 공개됩니다.
+            </div>
+            <button class="btn" onclick="startWorldCup()">🏆 50강 이름 월드컵 시작하기</button>
+        </div>
+
+        <!-- 2. 게임 화면 -->
+        <div id="screen-game" class="screen">
+            <div class="progress-container">
+                <div class="progress-info">
+                    <span id="round-title">50강 예선</span>
+                    <span id="match-counter">1 / 18</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progress-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="header-family" id="preview-banner" style="margin-bottom: 14px;">
+                심온 · 심이든 · <b>[셋째이름]</b>
+            </div>
+
+            <div class="match-container">
+                <div id="card-0" class="name-card" onclick="selectCandidate(0)">
+                    <div class="selection-badge">✓ 선택됨</div>
+                    <div id="name-0" class="name-title">이름1</div>
+                    <div id="desc-0" class="name-desc">뜻 설명</div>
+                </div>
+                <div id="card-1" class="name-card" onclick="selectCandidate(1)">
+                    <div class="selection-badge">✓ 선택됨</div>
+                    <div id="name-1" class="name-title">이름2</div>
+                    <div id="desc-1" class="name-desc">뜻 설명</div>
+                </div>
+            </div>
+
+            <button id="btn-confirm" class="btn" onclick="confirmSelection()" disabled>이름을 선택해주세요</button>
+        </div>
+
+        <!-- 3. 결과 화면 -->
+        <div id="screen-result" class="screen">
+            <div class="header-family">🎉 셋째 이름 월드컵 최종 결과</div>
+            <h1>최종 우승 이름</h1>
+            
+            <div class="winner-box">
+                <div class="winner-label">👑 1위 우승</div>
+                <div id="winner-name" class="winner-name">심이안</div>
+                <div id="winner-desc" class="winner-desc">하나님은 은혜로우시다</div>
+            </div>
+
+            <div class="top10-container">
+                <div class="top10-title">🌟 내가 선택한 TOP 10 리스트</div>
+                <ul id="top10-list" class="top10-list"></ul>
+            </div>
+
+            <button class="btn" onclick="restartWorldCup()">🔄 처음부터 다시 하기</button>
+        </div>
+    </div>
+
+    <script>
+        // 요청하신 제외 이름(심현, 심휘, 심겸, 심호, 심원우, 심우현, 심은우) 삭제 및 50개 재구성 완료
+        const rawNames = [
+            // 1. 성경 모티브 & 세련된 어감 (10개)
+            { name: "심이안", desc: "요한(John)의 파생형, '하나님은 은혜로우시다'" },
+            { name: "심노아", desc: "성경 인물 노아, '안식과 위로, 평안을 주는 사람'" },
+            { name: "심시온", desc: "시온산, '하나님의 도성, 은혜와 축복의 땅'" },
+            { name: "심이삭", desc: "성경 인물 이삭, '웃음과 기쁨을 주는 하나님의 자녀'" },
+            { name: "심요한", desc: "성경 인물 요한, '여호와는 은혜로우시다'" },
+            { name: "심다윗", desc: "성경 인물 다윗, '하나님의 사랑을 받는 담대한 자'" },
+            { name: "심아론", desc: "성경 인물 아론, '고귀한 산, 빛을 비추는 중보자'" },
+            { name: "심요엘", desc: "성경 인물 요엘, '여호와는 하나님이시다'" },
+            { name: "심요셉", desc: "성경 인물 요셉, '하나님이 형통하게 하시며 더하시는 축복'" },
+            { name: "심가온", desc: "가나안 어감 & 순우리말, '세상의 중심에서 빛나는 하나님의 자녀'" },
+
+            // 2. 첫째 '심온'과 어울리는 묵직하고 깔끔한 외자 이름 (11개)
+            { name: "심은", desc: "은혜 은(恩), '하나님의 한없는 은혜를 입은 사람'" },
+            { name: "심건", desc: "세울 건(建), '믿음의 반석 위에 굳건히 세워진 사람'" },
+            { name: "심찬", desc: "기릴 찬(讚), '삶으로 하나님을 찬양하는 사람'" },
+            { name: "심율", desc: "법칙 율(律), '하나님의 말씀과 법도를 따라 사는 사람'" },
+            { name: "심준", desc: "준걸 준(俊), '하나님의 기준을 따르는 뛰어난 인물'" },
+            { name: "심원", desc: "으뜸 원(元), '하나님의 소망이자 으뜸이 되는 사람'" },
+            { name: "심결", desc: "깨끗할 결(潔), '하나님 앞에서 정결하고 곧은 성품'" },
+            { name: "심윤", desc: "진실로 윤(允), '하나님의 축복이 마르지 않고 흐르는 사람'" },
+            { name: "심강", desc: "굳셀 강(強), '여호와로 인하여 강하고 담대한 사람'" },
+            { name: "심성", desc: "정성 성(誠), '거룩하고 성실하게 주를 섬기는 사람'" },
+            { name: "심진", desc: "참 진(眞), '진리이신 하나님의 말씀을 따르는 사람'" },
+
+            // 3. 'ㅇ' 초성 돌림 & 남자답고 세련된 이름 (14개)
+            { name: "심은호", desc: "은혜 은(恩)·넓을 호(浩), '하나님의 은혜가 바다처럼 넓은 아이'" },
+            { name: "심은찬", desc: "은혜 은(恩)·기릴 찬(讚), '주신 은혜에 감사하며 찬양하는 아이'" },
+            { name: "심은성", desc: "은혜 은(恩)·이룰 성(成), '하나님의 은혜로 큰 뜻을 이루는 사람'" },
+            { name: "심이준", desc: "도울 이(利)·법도 준(準), '세상에 유익을 주며 바르게 자라는 아이'" },
+            { name: "심이현", desc: "기쁠 이(怡)·어질 현(賢), '하나님의 기쁨이 되며 지혜로운 사람'" },
+            { name: "심이건", desc: "기쁠 이(怡)·세울 건(建), '기쁨과 믿음의 가문을 든든히 세우는 자'" },
+            { name: "심우진", desc: "도울 우(祐)·참 진(眞), '하나님의 도우심 속에 진리를 걷는 사람'" },
+            { name: "심유준", desc: "넉넉할 유(裕)·준걸 준(俊), '마음이 넓고 재능이 뛰어난 하나님의 일꾼'" },
+            { name: "심유찬", desc: "넉넉할 유(裕)·기릴 찬(讚), '풍성한 감사와 찬양이 넘치는 삶'" },
+            { name: "심유건", desc: "있을 유(有)·세울 건(建), '믿음의 기초를 든든히 세우는 사람'" },
+            { name: "심예준", desc: "예도 예(禮)·법도 준(準), '예수님의 성품을 닮아 바르고 멋진 사람'" },
+            { name: "심예찬", desc: "예수님을 찬양하고 높이는 복된 삶" },
+            { name: "심윤우", desc: "진실로 윤(允)·도울 우(祐), '하나님이 진실로 도우시고 함께하는 자'" },
+            { name: "심윤호", desc: "진실로 윤(允)·넓을 호(浩), '복음의 빛과 은혜를 넓게 펼치는 사람'" },
+
+            // 4. 성경적 가치를 담은 인기 남자아이 이름 (15개)
+            { name: "심하준", desc: "하늘 하·법도 준(準), '하나님이 준비하시고 세우신 사람'" },
+            { name: "심주원", desc: "주님 주(主)·바랄 원(願), '주님이 원하시고 기뻐하시는 자녀'" },
+            { name: "심주안", desc: "주님 주(主)·편안 안(安), '주님 안에서 참된 평안을 누리는 사람'" },
+            { name: "심주찬", desc: "주님 주(主)·기릴 찬(讚), '평생 주님을 찬양하며 승리하는 사람'" },
+            { name: "심주호", desc: "주님 주(主)·수호할 호(護), '주님이 늘 지키시고 보호하시는 아이'" },
+            { name: "심도윤", desc: "길 도(道)·진실로 윤(允), '진리의 길을 진실하게 걸어가는 사람'" },
+            { name: "심도하", desc: "길 도(道)·클 하(夏), '하나님의 올바른 길 안에서 크게 자라는 사람'" },
+            { name: "심서준", desc: "상서로울 서(瑞)·법도 준(準), '하나님의 복된 기준이 되는 사람'" },
+            { name: "심시우", desc: "베풀 시(施)·도울 우(祐), '하나님의 도우심으로 사랑을 베푸는 자'" },
+            { name: "심선우", desc: "착할 선(善)·도울 우(祐), '선을 행하며 하나님의 도우심을 입는 사람'" },
+            { name: "심지호", desc: "뜻 지(志)·넓을 호(浩), '하나님의 크고 넓은 뜻을 품은 사람'" },
+            { name: "심태오", desc: "클 태(太)·깨달을 오(悟) / 테오(하나님), '크신 뜻을 깨닫는 사람'" },
+            { name: "심하람", desc: "순우리말, '하늘(하나님)이 내린 소중하고 귀한 사람'" },
+            { name: "심다온", desc: "순우리말, '하나님의 좋은 축복이 다 오는 아이'" },
+            { name: "심한결", desc: "순우리말, '처음부터 끝까지 한결같은 믿음을 지키는 사람'" }
+        ];
+
+        let activeContestants = [];
+        let byeContestants = [];
+        let nextRoundWinners = [];
+        let currentMatchIndex = 0;
+        let selectedIndex = null;
+        let currentStageName = "";
+        let eliminatedHistory = [];
+
+        function shuffle(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startWorldCup() {
+            const shuffled = shuffle(rawNames);
+            activeContestants = shuffled.slice(0, 36);
+            byeContestants = shuffled.slice(36, 50);
+            nextRoundWinners = [];
+            currentMatchIndex = 0;
+            currentStageName = "50강 (예선)";
+            eliminatedHistory = [];
+
+            document.getElementById('screen-start').classList.remove('active');
+            document.getElementById('screen-game').classList.add('active');
+            loadMatch();
+        }
+
+        function loadMatch() {
+            selectedIndex = null;
+            document.getElementById('btn-confirm').disabled = true;
+            document.getElementById('btn-confirm').innerText = "이름을 선택해주세요";
+            document.getElementById('preview-banner').innerHTML = "형들과 불러보기: 심온 · 심이든 · <b>[셋째이름]</b>";
+
+            document.getElementById('card-0').classList.remove('selected');
+            document.getElementById('card-1').classList.remove('selected');
+
+            const totalMatches = activeContestants.length / 2;
+            const currentMatchNum = currentMatchIndex + 1;
+
+            document.getElementById('round-title').innerText = currentStageName;
+            document.getElementById('match-counter').innerText = `${currentMatchNum} / ${totalMatches}`;
+
+            const progressPercent = ((currentMatchNum - 1) / totalMatches) * 100;
+            document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+
+            const item0 = activeContestants[currentMatchIndex * 2];
+            const item1 = activeContestants[currentMatchIndex * 2 + 1];
+
+            document.getElementById('name-0').innerText = item0.name;
+            document.getElementById('desc-0').innerText = item0.desc;
+
+            document.getElementById('name-1').innerText = item1.name;
+            document.getElementById('desc-1').innerText = item1.desc;
+        }
+
+        function selectCandidate(index) {
+            selectedIndex = index;
+
+            if (index === 0) {
+                document.getElementById('card-0').classList.add('selected');
+                document.getElementById('card-1').classList.remove('selected');
+            } else {
+                document.getElementById('card-1').classList.add('selected');
+                document.getElementById('card-0').classList.remove('selected');
+            }
+
+            const chosenItem = activeContestants[currentMatchIndex * 2 + index];
+            document.getElementById('preview-banner').innerHTML = `형들과 불러보기: 심온 · 심이든 · <b style="text-decoration:underline;">${chosenItem.name}</b>`;
+
+            const confirmBtn = document.getElementById('btn-confirm');
+            confirmBtn.disabled = false;
+            confirmBtn.innerText = `✅ '${chosenItem.name}' 결정 완료 (다음 경기 →)`;
+        }
+
+        function confirmSelection() {
+            if (selectedIndex === null) return;
+
+            const winner = activeContestants[currentMatchIndex * 2 + selectedIndex];
+            const loser = activeContestants[currentMatchIndex * 2 + (selectedIndex === 0 ? 1 : 0)];
+
+            nextRoundWinners.push(winner);
+            eliminatedHistory.push(loser);
+
+            currentMatchIndex++;
+
+            if (currentMatchIndex * 2 >= activeContestants.length) {
+                const combinedPool = [...nextRoundWinners, ...byeContestants];
+                byeContestants = [];
+                nextRoundWinners = [];
+                currentMatchIndex = 0;
+
+                if (combinedPool.length === 1) {
+                    showResult(combinedPool[0]);
+                } else {
+                    activeContestants = shuffle(combinedPool);
+                    if (activeContestants.length === 2) currentStageName = "결승전";
+                    else if (activeContestants.length === 4) currentStageName = "4강전";
+                    else if (activeContestants.length === 8) currentStageName = "8강전";
+                    else currentStageName = `${activeContestants.length}강`;
+                    loadMatch();
+                }
+            } else {
+                loadMatch();
+            }
+        }
+
+        function showResult(winner) {
+            document.getElementById('screen-game').classList.remove('active');
+            document.getElementById('screen-result').classList.add('active');
+
+            document.getElementById('winner-name').innerText = winner.name;
+            document.getElementById('winner-desc').innerText = winner.desc;
+
+            const rankedList = [winner, ...[...eliminatedHistory].reverse()].slice(0, 10);
+            const top10ListEl = document.getElementById('top10-list');
+            top10ListEl.innerHTML = "";
+
+            rankedList.forEach((item, idx) => {
+                const li = document.createElement('li');
+                li.className = 'top10-item';
+                li.innerHTML = `
+                    <div class="top10-rank">${idx + 1}위</div>
+                    <div class="top10-info">
+                        <div class="top10-name">${item.name}</div>
+                        <div class="top10-desc">${item.desc}</div>
+                    </div>
+                `;
+                top10ListEl.appendChild(li);
+            });
+        }
+
+        function restartWorldCup() {
+            document.getElementById('screen-result').classList.remove('active');
+            document.getElementById('screen-start').classList.add('active');
+        }
+    </script>
+</body>
+</html>
